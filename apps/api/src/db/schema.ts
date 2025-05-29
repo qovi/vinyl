@@ -13,6 +13,10 @@ export const sleeveConditionsEnum = p.pgEnum('sleeveConditions', [
 
 export const userRolesEnum = p.pgEnum('userRoles', ['guest', 'user', 'admin']);
 
+export const categoriesEnum = p.pgEnum('categories', [
+  'lp vinyl', '12" maxi', '7" single', 'cd album', 'cd single'
+]);
+
 export const users = table(
   'users',
   {
@@ -30,7 +34,8 @@ export const users = table(
       .notNull(),
     updatedAt: p
       .timestamp('updated_at', { withTimezone: true, mode: 'date' })
-      .$onUpdate(() => new Date()),
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (t) => ({
     emailIndex: p.index('emailIndex').on(t.email),
@@ -43,21 +48,22 @@ export const products = table(
   {
     id: p.serial('id').primaryKey(),
     price: p.doublePrecision('price').notNull(),
-    conditionMedia: mediaConditionsEnum('conditionMedia'),
-    conditionSleeve: sleeveConditionsEnum('conditionSleeve'),
+    conditionMedia: mediaConditionsEnum('conditionMedia').notNull(),
+    conditionSleeve: sleeveConditionsEnum('conditionSleeve').notNull(),
     title: p.text('title').notNull(),
     artist: p.text('artist').notNull(),
-    releaseYear: p.text('releaseYear'),
-    genre: p.text('genre'),
+    releaseYear: p.integer('release_year').notNull(),
+    genre: p.text('genre').notNull(),
     coverUrl: p.text('cover_url').notNull(),
-    category: p.text('category').notNull(),
+    category: categoriesEnum('category').notNull(),
     createdAt: p
       .timestamp('created_at', { withTimezone: true, mode: 'date' })
       .default(sql`now()`)
       .notNull(),
     updatedAt: p
       .timestamp('updated_at', { withTimezone: true, mode: 'date' })
-      .$onUpdate(() => new Date()),
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (t) => ({
     artistIndex: p.index('artistIndex').on(t.artist),
